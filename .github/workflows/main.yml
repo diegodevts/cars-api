@@ -57,3 +57,6 @@ jobs:
 
       - name: Run application
         run: npm start
+        env:
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          PORT: ${{ vars.PORT }}
