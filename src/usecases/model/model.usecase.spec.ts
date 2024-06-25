@@ -11,6 +11,7 @@ import { DeleteModelUseCase } from './delete-model.usecase'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
 import { CreateModelDto } from '../../dtos/model/create.dto'
 import { randomUUID } from 'crypto'
+import { FindModelsUseCase } from './find-models.usecase'
 
 let modelRepository: InMemoryGenericRepository<
   Model,
@@ -19,6 +20,7 @@ let modelRepository: InMemoryGenericRepository<
 >
 let createUseCase: CreateModelUseCase
 let findUseCase: FindModelUseCase
+let findManyUseCase: FindModelsUseCase
 let updateUseCase: UpdateModelUseCase
 let deleteUseCase: DeleteModelUseCase
 
@@ -27,6 +29,7 @@ describe('Car Usecase', () => {
     modelRepository = new InMemoryGenericRepository()
     createUseCase = new CreateModelUseCase(modelRepository)
     findUseCase = new FindModelUseCase(modelRepository)
+    findManyUseCase = new FindModelsUseCase(modelRepository)
     updateUseCase = new UpdateModelUseCase(modelRepository)
     deleteUseCase = new DeleteModelUseCase(modelRepository)
 
@@ -46,6 +49,12 @@ describe('Car Usecase', () => {
 
     expect(model.id).toEqual(id)
     expect(model.name).toBe('Uno')
+  })
+
+  it('should be able to get all models', async () => {
+    const models = await findManyUseCase.handle(0, 1)
+
+    expect(models.length).to.greaterThanOrEqual(1)
   })
 
   it('should be able to update a model by id', async () => {

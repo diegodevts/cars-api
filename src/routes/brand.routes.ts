@@ -11,6 +11,10 @@ routes.get('/:id', async (request: Request, response: Response) => {
   return await crudBrandsController.find(request, response)
 })
 
+routes.get('/', async (request: Request, response: Response) => {
+  return await crudBrandsController.findAll(request, response)
+})
+
 routes.patch('/update/:id', async (request: Request, response: Response) => {
   return await crudBrandsController.update(request, response)
 })

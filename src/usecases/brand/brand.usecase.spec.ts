@@ -10,6 +10,7 @@ import { UpdateBrandUseCase } from './update-brand.usecase'
 import { DeleteBrandUseCase } from './delete-brand.usecase'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
 import { CreateBrandDto } from '../../dtos/brand/create.dto'
+import { FindBrandsUseCase } from './find-brands.usecase'
 
 let brandRepository: InMemoryGenericRepository<
   Brand,
@@ -20,6 +21,7 @@ let createUseCase: CreateBrandUseCase
 let findUseCase: FindBrandUseCase
 let updateUseCase: UpdateBrandUseCase
 let deleteUseCase: DeleteBrandUseCase
+let findManyUseCase: FindBrandsUseCase
 
 describe('Car Usecase', () => {
   beforeEach(async () => {
@@ -28,7 +30,7 @@ describe('Car Usecase', () => {
     findUseCase = new FindBrandUseCase(brandRepository)
     updateUseCase = new UpdateBrandUseCase(brandRepository)
     deleteUseCase = new DeleteBrandUseCase(brandRepository)
-
+    findManyUseCase = new FindBrandsUseCase(brandRepository)
     await createUseCase.handle({
       name: 'BMW'
     })
@@ -43,6 +45,12 @@ describe('Car Usecase', () => {
 
     expect(brand.id).toEqual(id)
     expect(brand.name).toBe('BMW')
+  })
+
+  it('should be able to get all brands', async () => {
+    const brands = await findManyUseCase.handle(0, 1)
+
+    expect(brands.length).to.greaterThanOrEqual(1)
   })
 
   it('should be able to update a brand by id', async () => {

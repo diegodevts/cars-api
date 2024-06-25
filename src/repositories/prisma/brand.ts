@@ -19,7 +19,10 @@ export class PrismaBrandsRepository
   }
 
   async findAll(skip: number, take: number): Promise<Brand[]> {
-    const brands = await prisma.brand.findMany({ skip, take })
+    const brands = await prisma.brand.findMany({
+      skip: skip ? skip : 0,
+      take: take ? take : 10
+    })
 
     return brands
   }

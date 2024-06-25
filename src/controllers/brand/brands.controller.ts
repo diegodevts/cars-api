@@ -1,17 +1,18 @@
 import { Request, Response } from 'express'
 
 import { z } from 'zod'
-import { FUEL_TYPE } from '@prisma/client'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
 import { CreateBrandUseCase } from '../../usecases/brand/create-brand.usecase'
 import { FindBrandUseCase } from '../../usecases/brand/find-brand.usecase'
 import { UpdateBrandUseCase } from '../../usecases/brand/update-brand.usecase'
 import { DeleteBrandUseCase } from '../../usecases/brand/delete-brand.usecase'
+import { FindBrandsUseCase } from '../../usecases/brand/find-brands.usecase'
 
 export class BrandsController {
   constructor(
     private createBrandUseCase: CreateBrandUseCase,
     private findBrandUseCase: FindBrandUseCase,
+    private findBrandsUseCase: FindBrandsUseCase,
     private updateBrandUseCase: UpdateBrandUseCase,
     private deleteBrandUseCase: DeleteBrandUseCase
   ) {}
@@ -53,6 +54,25 @@ export class BrandsController {
         return response.status(404).send({ message: err.message, code: 404 })
       }
 
+      return response
+        .status(500)
+        .send({ message: 'internal Server Error', code: 500 })
+    }
+  }
+
+  async findAll(request: Request, response: Response) {
+    const registerParamsSchema = z.object({
+      skip: z.optional(z.string()),
+      take: z.optional(z.string())
+    })
+
+    const { skip, take } = registerParamsSchema.parse(request.query)
+
+    try {
+      const brands = await this.findBrandsUseCase.handle(+skip, +take)
+
+      return response.status(200).send({ message: 'Ok!', code: 200, brands })
+    } catch (err: any) {
       return response
         .status(500)
         .send({ message: 'internal Server Error', code: 500 })

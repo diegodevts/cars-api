@@ -15594,10 +15594,22 @@ var DeleteCarUseCase = class {
   }
 };
 
+// src/usecases/car/find-cars.usecase.ts
+var FindCarsUseCase = class {
+  constructor(genericRepository) {
+    this.genericRepository = genericRepository;
+  }
+  async handle(skip, take) {
+    const cars = await this.genericRepository.findAll(skip, take);
+    return cars;
+  }
+};
+
 // src/usecases/car/cars.usecase.spec.ts
 var carsRepository;
 var createUseCase;
 var findUseCase;
+var findManyUseCase;
 var updateUseCase;
 var deleteUseCase;
 describe("Car Usecase", () => {
@@ -15607,6 +15619,7 @@ describe("Car Usecase", () => {
     findUseCase = new FindCarUseCase(carsRepository);
     updateUseCase = new UpdateCarUseCase(carsRepository);
     deleteUseCase = new DeleteCarUseCase(carsRepository);
+    findManyUseCase = new FindCarsUseCase(carsRepository);
     await createUseCase.handle({
       color: "black",
       doors: 4,
@@ -15622,6 +15635,10 @@ describe("Car Usecase", () => {
     const car = await findUseCase.handle("id", id);
     globalExpect(car.id).toEqual(id);
     globalExpect(car.color).toBe("black");
+  });
+  it("should be able to get all cars", async () => {
+    const cars = await findManyUseCase.handle(0, 1);
+    globalExpect(cars.length).to.greaterThanOrEqual(1);
   });
   it("should be able to update a car by id", async () => {
     const car = await updateUseCase.handle({ color: "white" }, id);

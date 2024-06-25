@@ -31,11 +31,24 @@ var ResourceNotFoundError = class extends Error {
   }
 };
 
+// src/helpers/json.ts
+var json = (param) => {
+  return JSON.parse(
+    JSON.stringify(
+      param,
+      (key, value) => typeof value === "bigint" ? value.toString() : value
+      // return everything else unchanged
+    )
+  );
+};
+var json_default = json;
+
 // src/controllers/car/cars.controller.ts
 var CarsController = class {
-  constructor(createCarUseCase, findCarUseCase, updateCarUseCase, deleteCarUseCase) {
+  constructor(createCarUseCase, findCarUseCase, findCarsUseCase, updateCarUseCase, deleteCarUseCase) {
     this.createCarUseCase = createCarUseCase;
     this.findCarUseCase = findCarUseCase;
+    this.findCarsUseCase = findCarsUseCase;
     this.updateCarUseCase = updateCarUseCase;
     this.deleteCarUseCase = deleteCarUseCase;
   }
@@ -80,6 +93,19 @@ var CarsController = class {
       if (err instanceof ResourceNotFoundError) {
         return response.status(404).send({ message: err.message, code: 404 });
       }
+      return response.status(500).send({ message: "internal Server Error", code: 500 });
+    }
+  }
+  async findAll(request, response) {
+    const registerParamsSchema = import_zod.z.object({
+      skip: import_zod.z.optional(import_zod.z.string()),
+      take: import_zod.z.optional(import_zod.z.string())
+    });
+    const { skip, take } = registerParamsSchema.parse(request.query);
+    try {
+      const cars = await this.findCarsUseCase.handle(+skip, +take);
+      return response.status(200).send({ message: "Ok!", code: 200, cars: json_default(cars) });
+    } catch (err) {
       return response.status(500).send({ message: "internal Server Error", code: 500 });
     }
   }

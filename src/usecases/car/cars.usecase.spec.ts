@@ -11,6 +11,8 @@ import { FindCarUseCase } from './find-car.usecase'
 import { UpdateCarUseCase } from './update-car.usecase'
 import { DeleteCarUseCase } from './delete-car.usecase'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
+import { FindCarsUseCase } from './find-cars.usecase'
+import { PortugueseCar } from '../../dtos/car/portuguese-car.dto'
 
 let carsRepository: InMemoryGenericRepository<
   Car,
@@ -19,6 +21,7 @@ let carsRepository: InMemoryGenericRepository<
 >
 let createUseCase: CreateCarUseCase
 let findUseCase: FindCarUseCase
+let findManyUseCase: FindCarsUseCase
 let updateUseCase: UpdateCarUseCase
 let deleteUseCase: DeleteCarUseCase
 
@@ -29,6 +32,7 @@ describe('Car Usecase', () => {
     findUseCase = new FindCarUseCase(carsRepository)
     updateUseCase = new UpdateCarUseCase(carsRepository)
     deleteUseCase = new DeleteCarUseCase(carsRepository)
+    findManyUseCase = new FindCarsUseCase(carsRepository)
 
     await createUseCase.handle({
       color: 'black',
@@ -48,6 +52,12 @@ describe('Car Usecase', () => {
 
     expect(car.id).toEqual(id)
     expect(car.color).toBe('black')
+  })
+
+  it('should be able to get all cars', async () => {
+    const cars = await findManyUseCase.handle(0, 1)
+
+    expect(cars.length).to.greaterThanOrEqual(1)
   })
 
   it('should be able to update a car by id', async () => {

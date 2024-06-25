@@ -4,6 +4,7 @@ import { CreateCarDto } from '../../dtos/car/create.dto'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
 import { GenericRepository } from '../../repositories/generic-repository'
 import { GenericUseCase } from '../generic.usecase'
+import { PortugueseCar } from '../../dtos/car/portuguese-car.dto'
 
 export class CreateCarUseCase implements GenericUseCase<Car> {
   constructor(

@@ -1,7 +1,8 @@
-import { Car } from '@prisma/client'
+import { $Enums, Car } from '@prisma/client'
 import { prisma } from '../../database/prisma'
 import { GenericRepository } from '../generic-repository'
 import { CreateCarDto } from '../../dtos/car/create.dto'
+import { PortugueseCar } from '../../dtos/car/portuguese-car.dto'
 
 export class PrismaCarsRepository
   implements GenericRepository<Car, CreateCarDto, Partial<Car>>
@@ -19,7 +20,20 @@ export class PrismaCarsRepository
   }
 
   async findAll(skip: number, take: number): Promise<Car[]> {
-    const cars = await prisma.car.findMany({ skip, take })
+    const cars = await prisma.car.findMany({
+      skip: skip ? skip : 0,
+      take: take ? take : 10,
+      select: {
+        id: true,
+        timestamp: true,
+        model_id: true,
+        year: true,
+        fuel_type: true,
+        doors: true,
+        color: true,
+        model: { select: { name: true, fipe: true } }
+      }
+    })
 
     return cars
   }

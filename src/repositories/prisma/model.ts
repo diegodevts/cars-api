@@ -19,7 +19,10 @@ export class PrismaModelsRepository
   }
 
   async findAll(skip: number, take: number): Promise<Model[]> {
-    const models = await prisma.model.findMany({ skip, take })
+    const models = await prisma.model.findMany({
+      skip: skip ? skip : 0,
+      take: take ? take : 10
+    })
 
     return models
   }

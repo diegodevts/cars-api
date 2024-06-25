@@ -6,11 +6,13 @@ import { CreateModelUseCase } from '../../usecases/model/create-model.usecase'
 import { FindModelUseCase } from '../../usecases/model/find-model.usecase'
 import { UpdateModelUseCase } from '../../usecases/model/update-model.usecase'
 import { DeleteModelUseCase } from '../../usecases/model/delete-model.usecase'
+import { FindModelsUseCase } from '../../usecases/model/find-models.usecase'
 
 export class ModelsController {
   constructor(
     private createModelUseCase: CreateModelUseCase,
     private findModelUseCase: FindModelUseCase,
+    private findModelsUseCase: FindModelsUseCase,
     private updateModelUseCase: UpdateModelUseCase,
     private deleteModelUseCase: DeleteModelUseCase
   ) {}
@@ -56,6 +58,25 @@ export class ModelsController {
         return response.status(404).send({ message: err.message, code: 404 })
       }
 
+      return response
+        .status(500)
+        .send({ message: 'internal Server Error', code: 500 })
+    }
+  }
+
+  async findAll(request: Request, response: Response) {
+    const registerParamsSchema = z.object({
+      skip: z.optional(z.string()),
+      take: z.optional(z.string())
+    })
+
+    const { skip, take } = registerParamsSchema.parse(request.query)
+
+    try {
+      const models = await this.findModelsUseCase.handle(+skip, +take)
+
+      return response.status(200).send({ message: 'Ok!', code: 200, models })
+    } catch (err: any) {
       return response
         .status(500)
         .send({ message: 'internal Server Error', code: 500 })

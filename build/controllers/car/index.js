@@ -57,7 +57,20 @@ var PrismaCarsRepository = class {
     });
   }
   async findAll(skip, take) {
-    const cars = await prisma.car.findMany({ skip, take });
+    const cars = await prisma.car.findMany({
+      skip: skip ? skip : 0,
+      take: take ? take : 10,
+      select: {
+        id: true,
+        timestamp: true,
+        model_id: true,
+        year: true,
+        fuel_type: true,
+        doors: true,
+        color: true,
+        model: { select: { name: true, fipe: true } }
+      }
+    });
     return cars;
   }
   async update(data, id) {
@@ -126,10 +139,25 @@ var DeleteCarUseCase = class {
 
 // src/controllers/car/cars.controller.ts
 var import_zod2 = require("zod");
+
+// src/helpers/json.ts
+var json = (param) => {
+  return JSON.parse(
+    JSON.stringify(
+      param,
+      (key, value) => typeof value === "bigint" ? value.toString() : value
+      // return everything else unchanged
+    )
+  );
+};
+var json_default = json;
+
+// src/controllers/car/cars.controller.ts
 var CarsController = class {
-  constructor(createCarUseCase2, findCarUseCase2, updateCarUseCase2, deleteCarUseCase2) {
+  constructor(createCarUseCase2, findCarUseCase2, findCarsUseCase2, updateCarUseCase2, deleteCarUseCase2) {
     this.createCarUseCase = createCarUseCase2;
     this.findCarUseCase = findCarUseCase2;
+    this.findCarsUseCase = findCarsUseCase2;
     this.updateCarUseCase = updateCarUseCase2;
     this.deleteCarUseCase = deleteCarUseCase2;
   }
@@ -174,6 +202,19 @@ var CarsController = class {
       if (err instanceof ResourceNotFoundError) {
         return response.status(404).send({ message: err.message, code: 404 });
       }
+      return response.status(500).send({ message: "internal Server Error", code: 500 });
+    }
+  }
+  async findAll(request, response) {
+    const registerParamsSchema = import_zod2.z.object({
+      skip: import_zod2.z.optional(import_zod2.z.string()),
+      take: import_zod2.z.optional(import_zod2.z.string())
+    });
+    const { skip, take } = registerParamsSchema.parse(request.query);
+    try {
+      const cars = await this.findCarsUseCase.handle(+skip, +take);
+      return response.status(200).send({ message: "Ok!", code: 200, cars: json_default(cars) });
+    } catch (err) {
       return response.status(500).send({ message: "internal Server Error", code: 500 });
     }
   }
@@ -222,15 +263,28 @@ var CarsController = class {
   }
 };
 
+// src/usecases/car/find-cars.usecase.ts
+var FindCarsUseCase = class {
+  constructor(genericRepository) {
+    this.genericRepository = genericRepository;
+  }
+  async handle(skip, take) {
+    const cars = await this.genericRepository.findAll(skip, take);
+    return cars;
+  }
+};
+
 // src/controllers/car/index.ts
 var repository = new PrismaCarsRepository();
 var createCarUseCase = new CreateCarUseCase(repository);
 var findCarUseCase = new FindCarUseCase(repository);
+var findCarsUseCase = new FindCarsUseCase(repository);
 var updateCarUseCase = new UpdateCarUseCase(repository);
 var deleteCarUseCase = new DeleteCarUseCase(repository);
 var crudCarsController = new CarsController(
   createCarUseCase,
   findCarUseCase,
+  findCarsUseCase,
   updateCarUseCase,
   deleteCarUseCase
 );

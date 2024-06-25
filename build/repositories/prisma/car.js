@@ -57,7 +57,20 @@ var PrismaCarsRepository = class {
     });
   }
   async findAll(skip, take) {
-    const cars = await prisma.car.findMany({ skip, take });
+    const cars = await prisma.car.findMany({
+      skip: skip ? skip : 0,
+      take: take ? take : 10,
+      select: {
+        id: true,
+        timestamp: true,
+        model_id: true,
+        year: true,
+        fuel_type: true,
+        doors: true,
+        color: true,
+        model: { select: { name: true, fipe: true } }
+      }
+    });
     return cars;
   }
   async update(data, id) {

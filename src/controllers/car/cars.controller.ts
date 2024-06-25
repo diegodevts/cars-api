@@ -1,17 +1,21 @@
 import { Request, Response } from 'express'
 
 import { z } from 'zod'
-import { FUEL_TYPE } from '@prisma/client'
+import { Car, FUEL_TYPE } from '@prisma/client'
 import { CreateCarUseCase } from '../../usecases/car/create-car.usecase'
 import { FindCarUseCase } from '../../usecases/car/find-car.usecase'
 import { UpdateCarUseCase } from '../../usecases/car/update-car.usecase'
 import { DeleteCarUseCase } from '../../usecases/car/delete-car.usecase'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
+import { FindCarsUseCase } from '../../usecases/car/find-cars.usecase'
+import { PortugueseCar } from '../../dtos/car/portuguese-car.dto'
+import json from '../../helpers/json'
 
 export class CarsController {
   constructor(
     private createCarUseCase: CreateCarUseCase,
     private findCarUseCase: FindCarUseCase,
+    private findCarsUseCase: FindCarsUseCase,
     private updateCarUseCase: UpdateCarUseCase,
     private deleteCarUseCase: DeleteCarUseCase
   ) {}
@@ -62,12 +66,35 @@ export class CarsController {
     try {
       const car = await this.findCarUseCase.handle('id', id)
 
-      return response.status(200).send({ message: 'Ok!', code: 200, car })
+      return response
+        .status(200)
+        .send({ message: 'Ok!', code: 200, car: json(car) })
     } catch (err: any) {
       if (err instanceof ResourceNotFoundError) {
         return response.status(404).send({ message: err.message, code: 404 })
       }
 
+      return response
+        .status(500)
+        .send({ message: 'internal Server Error', code: 500 })
+    }
+  }
+
+  async findAll(request: Request, response: Response) {
+    const registerParamsSchema = z.object({
+      skip: z.optional(z.string()),
+      take: z.optional(z.string())
+    })
+
+    const { skip, take } = registerParamsSchema.parse(request.query)
+
+    try {
+      const cars = await this.findCarsUseCase.handle(+skip, +take)
+
+      return response
+        .status(200)
+        .send({ message: 'Ok!', code: 200, cars: json(cars) })
+    } catch (err: any) {
       return response
         .status(500)
         .send({ message: 'internal Server Error', code: 500 })
@@ -102,9 +129,10 @@ export class CarsController {
       return response.status(201).send({
         message: 'Succesfuly updated!',
         code: 201,
-        car
+        car: json(car)
       })
     } catch (err: any) {
+      console.log(err)
       if (err instanceof ResourceNotFoundError) {
         return response.status(404).send({ message: err.message, code: 404 })
       }
