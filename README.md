@@ -40,8 +40,8 @@ npx prisma migrate deploy
 
 **Backend**
 
-No backend eu optei pelo desenvolvimento utilizando a metodologia TDD - que é o desenvolvimento orientado a testes - o qual eu julgo
-muito boa para projetos que tem propensão a escalabilidade, manutebilidade e disponibilidade, pelo fato de tenderem a ser aplicações críticas, cujas regras de domínio NÃO podem falhar em ambiente de produção. Como design pattern, eu optei pelo SOLID, o qual nos permite ter um controle e manutebilidade maior sobre uma aplicação totalmente desacoplada. Utilizei princípios de clean code como DRY, utilizando a estratégia de generic layers, pra não precisarmos repetir código, e o KISS, para mantermos a aplicação mais enxuta possível. Para a arquitetura, optei pela clean arquitecture, conhecida também como onion, separando regras de negócio por casos de uso. A aplicação tá bastante enxuta, ainda colocaria mais coisas, mas quis deixá-la o mais simples possível.
+No backend eu optei pelo desenvolvimento utilizando a metodologia TDD - que é o desenvolvimento orientado a testes - a qual eu julgo
+muito boa para projetos que tem propensão a escalabilidade, manutebilidade e disponibilidade, pelo fato de tenderem a ser aplicações críticas, cujas regras de domínio NÃO podem falhar em ambiente de produção (adicionei apenas um exemplo de testes unitário com os casos de uso). Como design pattern, eu optei pelo SOLID, o qual nos permite ter um controle e manutebilidade maior sobre uma aplicação totalmente desacoplada. Utilizei princípios de clean code como DRY, utilizando a estratégia de generic layers, pra não precisarmos repetir código, e o KISS, para mantermos a aplicação mais enxuta possível. Para a arquitetura, optei pela clean arquitecture, conhecida também como onion, separando regras de negócio por casos de uso. A aplicação tá bastante enxuta, ainda colocaria mais coisas, mas quis deixá-la o mais simples possível.
 
 **Devops**
 
