@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FUEL_TYPE {
+  GASOLINE
+  ETHANOL
+  DIESEL
+  NATURAL_GAS
+  LIQUEFIED_PETROLEUM_GAS
+}
+
+model Car {
+  id        String    @unique @default(uuid())
+  year      String
+  fuel_type FUEL_TYPE @default(GASOLINE)
+  doors     Int
+  color     String
+
+  model     Model  @relation(fields: [model_id], references: [id])
+  model_id  String
+  timestamp BigInt @default(dbgenerated("EXTRACT(epoch FROM NOW()) * 1000")) @map("created_at_millis")
+}
+
+model Model {
+  id       String @unique @default(uuid())
+  name     String
+  fipe     Float
+  brand    Brand  @relation(fields: [brand_id], references: [id])
+  brand_id String
+  car      Car[]
+}
+
+model Brand {
+  id    String  @unique @default(uuid())
+  name  String
+  model Model[]
+}
