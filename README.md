@@ -45,7 +45,7 @@ muito boa para projetos que tem propensão a escalabilidade, manutebilidade e di
 
 **Devops**
 
-Na parte de devops, eu optei por colocar a aplicação com um proxy-reverso e um load balancer com round-robin em duas instâncias apenas, cujas instâncias podem ser verificadas com os seus respectivos ids, indo ao endpoint: http://app.cars/ (Após ter os passos de instalação completamente feitos).
+Na parte de devops, eu optei por colocar a aplicação com um proxy-reverso e um load balancer com round-robin em duas instâncias apenas, cujas instâncias podem ser verificadas com os seus respectivos ids, indo ao endpoint: http://app.cars/ , e recarregando para que seja direcionado a ambas (Após ter os passos de instalação completamente feitos).
 Adicionei o proxy-reverso apenas para mostrar conhecimentos de segurança, e load balancing com round-robin para conhecimentos em escalabilidade e performance. Obviamente existem diversas outras técnicas que eu poderia ter utilizado para performance, como adicionando compressão gzip, adicionando workers, caching dentre outros.
 Adicionei um pequeno exemplo de entrega contínua (CI/CD) com [Github actions](./.github/workflows/main.yml), onde eu "simulo" uma publishing da aplicação em produção, utilizando o Docker.
 
