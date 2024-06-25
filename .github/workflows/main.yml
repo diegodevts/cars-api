@@ -58,5 +58,11 @@ jobs:
       - name: Deploy application
         run: docker-compose up -d
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until docker exec $(docker ps -qf "name=postgres") pg_isready -U your_db_user; do
+            sleep 1
+          done
+
       - name: Run application
         run: npm start
