@@ -48,6 +48,9 @@ jobs:
 
       - name: Apply Prisma migrations
         run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          PORT: ${{ vars.PORT }}
 
       - name: Run tests
         run: npm run test
