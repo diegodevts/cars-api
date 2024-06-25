@@ -44,7 +44,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        run: docker-compose -f docker-compose.yml build
+        run: docker-compose up -d
 
       - name: Apply Prisma migrations
         run: npx prisma migrate deploy
@@ -54,15 +54,6 @@ jobs:
 
       - name: Run tests
         run: npm run test
-
-      - name: Deploy application
-        run: docker-compose up -d
-
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until docker exec $(docker ps -qf "name=postgres") pg_isready -U your_db_user; do
-            sleep 1
-          done
 
       - name: Run application
         run: npm start
