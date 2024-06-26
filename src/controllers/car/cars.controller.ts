@@ -8,7 +8,6 @@ import { UpdateCarUseCase } from '../../usecases/car/update-car.usecase'
 import { DeleteCarUseCase } from '../../usecases/car/delete-car.usecase'
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error'
 import { FindCarsUseCase } from '../../usecases/car/find-cars.usecase'
-import { PortugueseCar } from '../../dtos/car/portuguese-car.dto'
 import json from '../../helpers/json'
 
 export class CarsController {
